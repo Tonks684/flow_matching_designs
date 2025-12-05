@@ -9,7 +9,7 @@ env/
 venv/
 
 # Data / checkpoints
-data/
+data/MNIST/*
 *.pt
 *.pth
 ckpts/
