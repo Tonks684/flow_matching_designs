@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=65.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flow_matching_designs"
+version = "0.1.0"
+description = "Flow-matching designs for conditional generative models (e.g. MNIST) with a modular architecture."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Samuel Tonks" }
+]
+
+dependencies = [
+  "torch>=2.2.0",
+  "torchvision>=0.17.0",
+  "torchaudio>=2.2.0",
+  "numpy>=1.23",
+  "Pillow>=10.0.0",
+  "pyyaml>=6.0",
+  "tqdm>=4.65",
+  "matplotlib>=3.7",
+  "seaborn>=0.12",
+  "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.4",
+  "pytest-cov>=4.1",
+  "mypy>=1.5",
+  "flake8>=6.1",
+  "notebook>=7.0",
+  "jupyterlab>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-name/flow_matching_designs"
+Repository = "https://github.com/your-name/flow_matching_designs"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["flow_matching_designs*"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["*.ipynb_checkpoints*", "__pycache__"]
+
+# Optional: nice CLI entry points
+[project.scripts]
+flow-train-mnist = "flow_matching_designs.scripts.train_mnist:main"

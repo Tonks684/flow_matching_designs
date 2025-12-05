@@ -1,0 +1,28 @@
+# "Strong" MNIST config: larger model, longer training.
+model:
+  in_channels: 1
+  out_channels: 1
+  num_classes: 10
+  image_size: 32
+  base_channels: 96              # ↑ wider than baseline (64)
+  channel_multipliers: [1, 2, 4, 8]
+  num_res_blocks: 3              # ↑ more depth per stage than baseline (2)
+  time_embedding_dim: 256        # ↑ richer time / label embedding
+
+path:
+  sigma: 0.1                     # currently unused; kept for compatibility
+  alpha_schedule: linear
+  beta_schedule: linear
+
+training:
+  num_epochs: 200                # ↑ more epochs than baseline (50)
+  batch_size: 128                # ↓ smaller than 256 to help with memory
+  lr: 0.0001                     # slightly smaller lr for larger model
+  eta: 0.15                      # slightly more label dropout for CFG
+  null_label: 10                 # matches 0..9 real classes + null
+  seed: 123
+
+data:
+  data_dir: "./data"
+  num_workers: 4
+  pin_memory: true

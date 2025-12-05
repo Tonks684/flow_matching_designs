@@ -1,0 +1,34 @@
+# Core numerical + ML stack
+torch>=2.2.0
+torchvision>=0.17.0
+torchaudio>=2.2.0  # not strictly required but common alongside torch
+
+# For datasets and transforms
+numpy>=1.23
+Pillow>=10.0.0
+
+# YAML config loading
+pyyaml>=6.0
+
+# Progress bars
+tqdm>=4.65
+
+# Optional utilities (recommended)
+matplotlib>=3.7    # for utils.viz or sampling visualisation
+seaborn>=0.12      # optional for nicer plots
+scipy>=1.10        # if you expand sampling/sde/ode solvers later
+
+# Testing
+pytest>=7.4
+pytest-cov>=4.1
+
+# Type hints + linting (optional but useful for a clean repo)
+mypy>=1.5
+flake8>=6.1
+
+# Jupyter notebooks (optional but likely for your notebooks/)
+notebook>=7.0
+jupyterlab>=4.0
+
+# For future packaging friendliness
+setuptools>=65
