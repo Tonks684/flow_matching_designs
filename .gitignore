@@ -14,6 +14,7 @@ data/MNIST/*
 *.pth
 ckpts/
 checkpoints/
+samples/
 
 # OS files
 .DS_Store
@@ -30,3 +31,6 @@ build/
 # IDE stuff
 .vscode/
 .idea/
+
+#Training Log
+training_log.csv

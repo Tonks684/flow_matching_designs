@@ -59,8 +59,35 @@ flow_matching_designs/
 ├── requirements.txt
 ├── pyproject.toml               # Build/installation metadata
 └── Dockerfile
-
 ```
+
+### Installation (dev mode):
+```
+git clone https://github.com/Tonks684/flow_matching_designs.git
+cd flow_matching_designs
+pip install -e .
+```
+
+Train MNIST baseline:
+```
+PYTHONPATH=./src python scripts/train_mnist.py --config configs/mnist_baseline.yaml
+```
+## 🖼 Sampling Images
+
+Generate MNIST digits from a trained model:
+```
+python scripts/sample_mnist.py \
+    --checkpoint ckpts/mnist_unet2d.pt \
+    --n_samples 64 \
+    --outfile samples.png
+```
+## 📤 Exporting a Checkpoint
+```
+python scripts/export_checkpoint.py \
+    --checkpoint ckpts/mnist_unet2d.pt \
+    --out models/exported_model.pt
+```
+
 ## 🧩 Adding New Models
 
 All models register themselves via:
@@ -97,26 +124,4 @@ Run training inside container:
 docker run --gpus all -v $(pwd):/workspace flow-matching \
     python scripts/train_mnist.py --config configs/mnist_baseline.yaml
 ```
-## 📤 Exporting a Checkpoint
-```
-python scripts/export_checkpoint.py \
-    --checkpoint ckpts/mnist_unet2d.pt \
-    --out models/exported_model.pt
-```
-## 🖼 Sampling Images
-
-Generate MNIST digits from a trained model:
-```
-python scripts/sample_mnist.py \
-    --checkpoint ckpts/mnist_unet2d.pt \
-    --n_samples 64 \
-    --outfile samples.png
-```
-
-This will:
-
-- Load the trained model
-- Integrate the flow ODE
-- Save generated samples to samples.png
-
 
