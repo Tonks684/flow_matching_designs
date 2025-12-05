@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "flow_matching_designs"
 version = "0.1.0"
-description = "Flow-matching designs for conditional generative models (e.g. MNIST) with a modular architecture."
+description = "Flow-matching designs for conditional generative models with a modular architecture."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
@@ -37,8 +37,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-name/flow_matching_designs"
-Repository = "https://github.com/your-name/flow_matching_designs"
+[project.urls]
+Homepage = "https://github.com/Tonks684/flow_matching_designs"
+Repository = "https://github.com/Tonks684/flow_matching_designs"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
