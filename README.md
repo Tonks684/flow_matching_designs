@@ -24,7 +24,9 @@ flow_matching_designs/
 ├── configs/                     # YAML config files for training
 │   ├── mnist_baseline.yaml
 │   ├── mnist_cfg_strong.yaml
-│   └── mnist_vit.yaml
+│   ├── mnist_vit.yaml
+│   ├── mnist_img2img.yaml
+│   └── lightmycells_img2img.yaml
 │
 ├── scripts/                     # Run scripts (train/sample/export)
 │   ├── train_mnist.py
@@ -38,6 +40,10 @@ flow_matching_designs/
 │   │   ├── paths.py
 │   │   ├── odes.py
 │   │   └── simulators.py
+│   │
+│   ├── data/                    # Dataset loaders
+│   │   ├── mnist.py             # MNIST class-conditional + noisy pairs
+│   │   └── lightmycells.py      # Light My Cells BF/PC → fluorescence
 │   │
 │   ├── models/                  # Architectures + model registry
 │   │   ├── unet.py
@@ -83,6 +89,13 @@ Train MNIST with ViT:
 ```
 PYTHONPATH=./src python scripts/train_mnist.py --config configs/mnist_vit.yaml
 ```
+
+Train Light My Cells (transmitted light → fluorescence):
+```
+PYTHONPATH=./src python scripts/train_mnist.py --config configs/lightmycells_img2img.yaml
+```
+
+> **Dataset:** Download Light My Cells from [BioImage Archive S-BIAD1047](https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD1047) and organise as `data/lightmycells/train/{nucleus,mitochondria,tubulin,actin}/image_*_{IM,GT}.tif`.
 ## 🖼 Sampling Images
 
 Generate MNIST digits from a trained model:
@@ -98,6 +111,32 @@ python scripts/export_checkpoint.py \
     --checkpoint ckpts/mnist_unet2d.pt \
     --out models/exported_model.pt
 ```
+
+## 🖼 Example Outputs
+
+### MNIST class-conditional generation (UNet2D baseline)
+> Generated digits conditioned on class labels via classifier-free guidance.
+
+| Condition | Generated |
+|-----------|-----------|
+| Class: 0  | ![mnist-0](docs/images/mnist_class0.png) |
+| Class: 1  | ![mnist-1](docs/images/mnist_class1.png) |
+| Class: 7  | ![mnist-7](docs/images/mnist_class7.png) |
+
+*Run `python scripts/sample_mnist.py --checkpoint ckpts/mnist_unet2d.pt --n_samples 64 --outfile docs/images/mnist_samples.png` to generate these after training.*
+
+---
+
+### Light My Cells — transmitted light → fluorescence (image-to-image)
+> Condition: brightfield / phase contrast microscopy image.  Target: fluorescence channel (nucleus, mitochondria, tubulin, actin).
+
+| Transmitted Light (condition) | Fluorescence (target) | Predicted |
+|-------------------------------|----------------------|-----------|
+| ![bf](docs/images/lmc_bf.png) | ![fluor](docs/images/lmc_fluor.png) | ![pred](docs/images/lmc_pred.png) |
+
+*Run the Light My Cells training script and replace placeholder images with model outputs.*
+
+---
 
 ## 🤖 Available Models
 

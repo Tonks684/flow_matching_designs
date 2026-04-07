@@ -1,0 +1,32 @@
+model_name: "unet2d"
+
+model:
+  in_channels: 1          # fluorescence target (greyscale)
+  out_channels: 1
+  num_classes: 4          # nucleus=0, mitochondria=1, tubulin=2, actin=3
+  image_size: 512
+  base_channels: 64
+  channel_multipliers: [1, 2, 4, 8]
+  num_res_blocks: 2
+  time_embedding_dim: 128
+  cond_channels: 1        # transmitted-light condition image (BF / PC / DIC)
+
+path:
+  sigma: 0.1
+  alpha_schedule: linear
+  beta_schedule: linear
+
+training:
+  num_epochs: 100
+  batch_size: 16
+  lr: 0.0002
+  eta: 0.1
+  null_label: 4           # index beyond num_classes reserved for CFG null
+  seed: 42
+
+data:
+  data_dir: "./data/lightmycells"
+  organelles: ["nucleus", "mitochondria", "tubulin", "actin"]
+  image_size: 512
+  num_workers: 4
+  pin_memory: true
