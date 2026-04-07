@@ -112,29 +112,19 @@ python scripts/export_checkpoint.py \
     --out models/exported_model.pt
 ```
 
-## 🖼 Example Outputs
+## 🖼 Datasets
 
-### MNIST class-conditional generation (UNet2D baseline)
-> Generated digits conditioned on class labels via classifier-free guidance.
+### MNIST (class-conditional)
+> Ten digit classes — the model learns to generate each conditioned on its class label.
 
-| Condition | Generated |
-|-----------|-----------|
-| Class: 0  | ![mnist-0](docs/images/mnist_class0.png) |
-| Class: 1  | ![mnist-1](docs/images/mnist_class1.png) |
-| Class: 7  | ![mnist-7](docs/images/mnist_class7.png) |
-
-*Run `python scripts/sample_mnist.py --checkpoint ckpts/mnist_unet2d.pt --n_samples 64 --outfile docs/images/mnist_samples.png` to generate these after training.*
+![MNIST dataset examples](docs/images/mnist_examples.png)
 
 ---
 
-### Light My Cells — transmitted light → fluorescence (image-to-image)
-> Condition: brightfield / phase contrast microscopy image.  Target: fluorescence channel (nucleus, mitochondria, tubulin, actin).
+### Light My Cells (image-to-image)
+> Paired transmitted-light microscopy images (condition) and fluorescence ground truth (target) across four organelle channels.  Dataset: [BioImage Archive S-BIAD1047](https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD1047).
 
-| Transmitted Light (condition) | Fluorescence (target) | Predicted |
-|-------------------------------|----------------------|-----------|
-| ![bf](docs/images/lmc_bf.png) | ![fluor](docs/images/lmc_fluor.png) | ![pred](docs/images/lmc_pred.png) |
-
-*Run the Light My Cells training script and replace placeholder images with model outputs.*
+![Light My Cells paired examples](docs/images/lmc_pairs.png)
 
 ---
 
