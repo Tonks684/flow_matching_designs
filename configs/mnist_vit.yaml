@@ -1,0 +1,32 @@
+model_name: "vit2d"
+
+model:
+  in_channels: 1
+  out_channels: 1
+  image_size: 32
+  num_classes: 10
+  patch_size: 4           # 32/4 = 8 → 64 patches
+  hidden_dim: 384
+  num_heads: 6
+  num_layers: 6
+  mlp_ratio: 4.0
+  dropout: 0.0
+  time_embedding_dim: 128
+
+path:
+  sigma: 0.1
+  alpha_schedule: linear
+  beta_schedule: linear
+
+training:
+  num_epochs: 50
+  batch_size: 256
+  lr: 0.0002
+  eta: 0.1
+  null_label: 10
+  seed: 42
+
+data:
+  data_dir: "./data"
+  num_workers: 4
+  pin_memory: true

@@ -34,3 +34,4 @@ def build_model(name: str, cfg: dict) -> ConditionalVectorField:
 # Import model modules here so that their registration decorators run
 # (side-effect imports to populate MODEL_REGISTRY).
 from . import unet  # noqa: F401  # ensure UNet is registered
+from . import vit   # noqa: F401  # ensure ViT is registered
