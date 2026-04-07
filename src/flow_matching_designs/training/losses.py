@@ -16,18 +16,20 @@ def cfg_flow_matching_loss(
     eta: float,
     device: torch.device,
     null_label: int,
+    cond: Optional[torch.Tensor] = None,  # (B, C_cond, H, W) condition images, or None
 ) -> torch.Tensor:
     """
     Classifier-free guidance flow-matching loss using a batch from a DataLoader.
 
     Args:
-        model: conditional vector field u_theta(x, t, y_tilde)
+        model: conditional vector field u_theta(x, t, y_tilde, cond)
         path: probability path, must implement sample_conditional_path and conditional_vector_field
         x_data: (B, C, H, W) data batch (acts as z in the notation)
         y: (B,) class labels
         eta: probability of dropping the label (CFG mask rate)
         device: torch.device
         null_label: index used as the "null" class
+        cond: (B, C_cond, H, W) condition images for image-to-image tasks, or None
     """
     # z is just the data batch
     z = x_data.to(device)          # (B, C, H, W)
@@ -35,10 +37,15 @@ def cfg_flow_matching_loss(
 
     batch_size = z.size(0)
 
-    # 1) Classifier-free masking
+    # 1) Classifier-free masking — drop label and condition with the same mask
     mask = (torch.rand(batch_size, device=device) < eta)
     y_tilde = y.clone()
     y_tilde[mask] = null_label
+
+    cond_tilde: Optional[torch.Tensor] = None
+    if cond is not None:
+        cond_tilde = cond.to(device).clone()
+        cond_tilde[mask] = 0.0  # null condition = zeros
 
     # 2) Sample t and x_t
     t = torch.rand(batch_size, device=device)       # (B,)
@@ -49,7 +56,7 @@ def cfg_flow_matching_loss(
     with torch.no_grad():
         target_vf = path.conditional_vector_field(x, z, t)  # (B, C, H, W)
 
-    pred_vf = model(x, t, y_tilde)                          # (B, C, H, W)
+    pred_vf = model(x, t, y_tilde, cond=cond_tilde)         # (B, C, H, W)
 
     # --- SAFETY CHECKS (so we don't get a cryptic TypeError) ---
     if target_vf is None:

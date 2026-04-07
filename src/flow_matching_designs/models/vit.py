@@ -74,6 +74,9 @@ class ViT2DConfig:
     time_embedding_dim: int = 128
     label_embedding_dim: Optional[int] = None  # defaults to hidden_dim
 
+    # Image conditioning (channel concatenation)
+    cond_channels: int = 0  # set > 0 to enable image-to-image conditioning
+
 
 # ---------------------------------------------------------------------------
 # Transformer block with AdaLN-Zero conditioning
@@ -158,8 +161,9 @@ class ViT2D(ConditionalVectorField):
 
         # ----- Patch embedding -----
         # Equivalent to flattening patches and projecting; a single strided Conv2d is cleaner.
+        # When cond_channels > 0, condition image is channel-concatenated before embedding.
         self.patch_embed = nn.Conv2d(
-            cfg.in_channels, cfg.hidden_dim,
+            cfg.in_channels + cfg.cond_channels, cfg.hidden_dim,
             kernel_size=cfg.patch_size, stride=cfg.patch_size,
         )
 
@@ -237,12 +241,14 @@ class ViT2D(ConditionalVectorField):
         x: torch.Tensor,
         t: torch.Tensor,
         y: Optional[torch.Tensor] = None,
+        cond: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
         """
         Args:
             x: (B, in_channels, H, W)
             t: (B,) or (B, 1) time in [0, 1]
             y: (B,) class labels, or None
+            cond: (B, cond_channels, H, W) condition image, or None
         Returns:
             (B, out_channels, H, W)  — vector field estimate
         """
@@ -251,6 +257,10 @@ class ViT2D(ConditionalVectorField):
         if self.label_emb is not None and y is not None:
             y_emb = self.label_proj(self.label_emb(y))     # (B, hidden_dim)
             emb = emb + y_emb
+
+        # Channel-concatenate condition image before patch embedding
+        if cond is not None:
+            x = torch.cat([x, cond], dim=1)  # (B, in_channels + cond_channels, H, W)
 
         # Tokenise image
         tokens = self._patchify(x) + self.pos_emb          # (B, N, hidden_dim)

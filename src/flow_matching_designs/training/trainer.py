@@ -125,8 +125,12 @@ class CFGTrainer(Trainer):
             self.null_label = null_label
 
     def get_train_loss(self, batch, device: torch.device) -> torch.Tensor:
-        # Expect batch to be (images, labels) from DataLoader
-        x_data, y = batch
+        # Batch can be (images, labels) or (images, cond, labels)
+        if len(batch) == 3:
+            x_data, cond, y = batch
+        else:
+            x_data, y = batch
+            cond = None
         return cfg_flow_matching_loss(
             model=self.model,
             path=self.path,
@@ -135,4 +139,5 @@ class CFGTrainer(Trainer):
             eta=self.eta,
             device=device,
             null_label=self.null_label,
+            cond=cond,
         )

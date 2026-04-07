@@ -26,6 +26,9 @@ class UNet2DConfig:
     time_embedding_dim: int = 128
     label_embedding_dim: Optional[int] = None  # if None → use time_embedding_dim
 
+    # Image conditioning (channel concatenation)
+    cond_channels: int = 0  # set > 0 to enable image-to-image conditioning
+
 
 class SinusoidalTimeEmbedding(nn.Module):
     def __init__(self, dim: int):
@@ -101,7 +104,7 @@ class ConditionalUNet2D(ConditionalVectorField):
         # ----- U-Net encoder/decoder -----
         channels = [cfg.base_channels * m for m in cfg.channel_multipliers]
 
-        self.input_conv = nn.Conv2d(cfg.in_channels, channels[0], kernel_size=3, padding=1)
+        self.input_conv = nn.Conv2d(cfg.in_channels + cfg.cond_channels, channels[0], kernel_size=3, padding=1)
 
         # Down path
         self.down_blocks = nn.ModuleList()
@@ -133,18 +136,29 @@ class ConditionalUNet2D(ConditionalVectorField):
     # ------------------------------------------------------------------
     # forward: x (B,C,H,W), t (B,) or (B,1), y (B,) optional
     # ------------------------------------------------------------------
-    def forward(self, x: torch.Tensor, t: torch.Tensor, y: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def forward(
+        self,
+        x: torch.Tensor,
+        t: torch.Tensor,
+        y: Optional[torch.Tensor] = None,
+        cond: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
         """
         Args:
             x: (B, in_channels, H, W)
             t: (B,) or (B,1) time in [0,1]
             y: (B,) class labels, optional (ignored if cfg.num_classes is None)
+            cond: (B, cond_channels, H, W) condition image, optional
         Returns:
             (B, out_channels, H, W)
         """
         if self.cfg.image_size is not None:
             assert x.shape[-1] == self.cfg.image_size and x.shape[-2] == self.cfg.image_size, \
                 f"Expected image_size={self.cfg.image_size}, got {x.shape[-2:]}"
+
+        # ---- Channel-concatenate condition image ----
+        if cond is not None:
+            x = torch.cat([x, cond], dim=1)  # (B, in_channels + cond_channels, H, W)
 
         # ---- Build conditioning embedding ----
         temb = self.time_mlp(t)      # (B, time_embedding_dim)
